@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../core/format/money_format.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/local/local_product_catalog.dart';
+import '../../domain/models/cart_summary.dart';
 import '../../domain/models/product.dart';
+import '../../domain/use_cases/calculate_cart_summary.dart';
 
 class ProductSelectionScreen extends StatefulWidget {
   const ProductSelectionScreen({
@@ -34,13 +36,6 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     _products = widget.products ?? LocalProductCatalog.obtenerProductosActivos();
     _quantitiesByProduct = Map<int, int>.from(widget.initialQuantitiesByProduct)
       ..removeWhere((_, quantity) => quantity <= 0);
-  }
-
-  int get _totalProductCount {
-    return _quantitiesByProduct.values.fold(
-      0,
-      (total, quantity) => total + quantity,
-    );
   }
 
   void _increaseQuantity(Product product) {
@@ -77,8 +72,29 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     Navigator.of(context).maybePop();
   }
 
+  void _goToSummary() {
+    if (widget.onGoToSummary != null) {
+      widget.onGoToSummary!();
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'La pantalla de resumen se agregará en un próximo commit.',
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cartSummary = CalculateCartSummary.ejecutar(
+      products: _products,
+      quantitiesByProduct: _quantitiesByProduct,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.fondoAplicacion,
       body: SafeArea(
@@ -102,13 +118,12 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                   ),
                   const SizedBox(height: 16),
                   _PartialSummaryCard(
-                    totalProductCount: _totalProductCount,
+                    cartSummary: cartSummary,
                   ),
                   const SizedBox(height: 16),
                   _GoToSummaryButton(
-                    enabled: false,
-                    productCount: _totalProductCount,
-                    onPressed: widget.onGoToSummary,
+                    cartSummary: cartSummary,
+                    onPressed: _goToSummary,
                   ),
                 ],
               ),
@@ -148,7 +163,7 @@ class _PurchaseHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          child: const Text('← Menú principal'),
+          child: const Text('Menú principal'),
         ),
         const SizedBox(height: 16),
         Text(
@@ -457,10 +472,10 @@ class _QuantityButton extends StatelessWidget {
 
 class _PartialSummaryCard extends StatelessWidget {
   const _PartialSummaryCard({
-    required this.totalProductCount,
+    required this.cartSummary,
   });
 
-  final int totalProductCount;
+  final CartSummary cartSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -478,12 +493,12 @@ class _PartialSummaryCard extends StatelessWidget {
             const SizedBox(height: 10),
             _PartialSummaryRow(
               label: 'Productos agregados',
-              value: totalProductCount.toString(),
+              value: cartSummary.cantidadTotalProductos.toString(),
             ),
             const SizedBox(height: 6),
-            const _PartialSummaryRow(
+            _PartialSummaryRow(
               label: 'Total parcial',
-              value: r'$0.00',
+              value: formatearCentavosComoPesos(cartSummary.totalCentavos),
             ),
           ],
         ),
@@ -548,23 +563,21 @@ class _PartialSummaryRow extends StatelessWidget {
 
 class _GoToSummaryButton extends StatelessWidget {
   const _GoToSummaryButton({
-    required this.enabled,
-    required this.productCount,
+    required this.cartSummary,
     required this.onPressed,
   });
 
-  final bool enabled;
-  final int productCount;
-  final VoidCallback? onPressed;
+  final CartSummary cartSummary;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final buttonText = productCount > 0
-        ? 'Ver resumen de compra ($productCount)'
+    final buttonText = !cartSummary.estaVacio
+        ? 'Ver resumen de compra (${cartSummary.cantidadTotalProductos})'
         : 'Ver resumen de compra';
 
     return FilledButton(
-      onPressed: enabled ? onPressed : null,
+      onPressed: cartSummary.estaVacio ? null : onPressed,
       style: FilledButton.styleFrom(
         backgroundColor: AppColors.amarilloMaiz,
         foregroundColor: AppColors.verdeOscuro,
