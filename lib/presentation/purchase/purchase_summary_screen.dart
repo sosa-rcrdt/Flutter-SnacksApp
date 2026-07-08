@@ -4,8 +4,10 @@ import '../../core/format/money_format.dart';
 import '../../core/theme/app_colors.dart';
 import '../../domain/models/cart_summary.dart';
 import '../../domain/models/payment_summary.dart';
+import '../../domain/models/payment_validation_message.dart';
 import '../../domain/models/product.dart';
 import '../../domain/use_cases/calculate_payment_summary.dart';
+import '../../domain/use_cases/calculate_payment_validation_message.dart';
 
 class PurchaseSummaryScreen extends StatefulWidget {
   const PurchaseSummaryScreen({
@@ -80,6 +82,12 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
       dineroRecibidoCentavos: dineroRecibidoCentavos,
     );
 
+    final validationMessage = CalculatePaymentValidationMessage.ejecutar(
+      textoDineroRecibido: _receivedAmountController.text,
+      cartSummary: widget.cartSummary,
+      paymentSummary: paymentSummary,
+    );
+
     return Scaffold(
       backgroundColor: AppColors.fondoAplicacion,
       body: SafeArea(
@@ -104,6 +112,7 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
                   _PaymentSection(
                     controller: _receivedAmountController,
                     paymentSummary: paymentSummary,
+                    validationMessage: validationMessage,
                     onChanged: (_) => setState(() {}),
                   ),
                   const SizedBox(height: 16),
@@ -321,11 +330,13 @@ class _PaymentSection extends StatelessWidget {
   const _PaymentSection({
     required this.controller,
     required this.paymentSummary,
+    required this.validationMessage,
     required this.onChanged,
   });
 
   final TextEditingController controller;
   final PaymentSummary paymentSummary;
+  final PaymentValidationMessage validationMessage;
   final ValueChanged<String> onChanged;
 
   @override
@@ -364,10 +375,18 @@ class _PaymentSection extends StatelessWidget {
                 hintText: 'Ej. 200',
                 filled: true,
                 fillColor: AppColors.fondoAplicacion,
+                errorText: controller.text.trim().isNotEmpty &&
+                        !paymentSummary.dineroRecibidoValido
+                    ? 'Cantidad no válida'
+                    : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18),
                 ),
               ),
+            ),
+            const SizedBox(height: 12),
+            _ValidationMessageCard(
+              message: validationMessage,
             ),
             const SizedBox(height: 16),
             _SummaryRow(
@@ -398,6 +417,97 @@ class _PaymentSection extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _ValidationMessageCard extends StatelessWidget {
+  const _ValidationMessageCard({
+    required this.message,
+  });
+
+  final PaymentValidationMessage message;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = _ValidationMessageColors.fromType(message.tipo);
+
+    return Card(
+      color: colors.backgroundColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              colors.icon,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colors.foregroundColor,
+                    fontWeight: FontWeight.w900,
+                  ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.titulo,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: colors.foregroundColor,
+                          fontWeight: FontWeight.w800,
+                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    message.descripcion,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colors.foregroundColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ValidationMessageColors {
+  final Color backgroundColor;
+  final Color foregroundColor;
+  final String icon;
+
+  const _ValidationMessageColors({
+    required this.backgroundColor,
+    required this.foregroundColor,
+    required this.icon,
+  });
+
+  factory _ValidationMessageColors.fromType(PaymentValidationType type) {
+    return switch (type) {
+      PaymentValidationType.success => const _ValidationMessageColors(
+          backgroundColor: AppColors.fondoExito,
+          foregroundColor: AppColors.exito,
+          icon: '✓',
+        ),
+      PaymentValidationType.warning => const _ValidationMessageColors(
+          backgroundColor: AppColors.fondoAdvertencia,
+          foregroundColor: AppColors.advertencia,
+          icon: '!',
+        ),
+      PaymentValidationType.error => const _ValidationMessageColors(
+          backgroundColor: AppColors.fondoError,
+          foregroundColor: AppColors.error,
+          icon: '×',
+        ),
+    };
   }
 }
 
