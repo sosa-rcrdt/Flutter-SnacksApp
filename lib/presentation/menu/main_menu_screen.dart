@@ -58,9 +58,9 @@ class _MainDescription extends StatelessWidget {
       'Sistema de ventas para elotes y snacks',
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.verdePrincipal,
-            fontWeight: FontWeight.w500,
-          ),
+        color: AppColors.verdePrincipal,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 }
@@ -74,9 +74,7 @@ class _MainMenuCard extends StatelessWidget {
       color: AppColors.tarjetaMenu,
       elevation: 4,
       shadowColor: Colors.black.withValues(alpha: 0.16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -85,9 +83,9 @@ class _MainMenuCard extends StatelessWidget {
             Text(
               'Menú principal',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 16),
             FilledButton(
