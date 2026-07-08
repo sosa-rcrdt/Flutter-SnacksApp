@@ -1,10 +1,36 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
+import '../data/database/app_database.dart';
+import '../data/repositories/sale_repository.dart';
 import 'router.dart';
 
-class SnacksApp extends StatelessWidget {
+class SnacksApp extends StatefulWidget {
   const SnacksApp({super.key});
+
+  @override
+  State<SnacksApp> createState() => _SnacksAppState();
+}
+
+class _SnacksAppState extends State<SnacksApp> {
+  late final AppDatabase _database;
+  late final SaleRepository _saleRepository;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _database = AppDatabase();
+    _saleRepository = SaleRepository(_database);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_database.close());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +48,12 @@ class SnacksApp extends StatelessWidget {
         ),
       ),
       initialRoute: AppRoutes.menuPrincipal,
-      onGenerateRoute: AppRouter.onGenerateRoute,
+      onGenerateRoute: (settings) {
+        return AppRouter.onGenerateRoute(
+          settings,
+          saleRepository: _saleRepository,
+        );
+      },
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
+import '../data/repositories/sale_repository.dart';
 import '../domain/models/cart_summary.dart';
 import '../domain/models/product.dart';
 import '../presentation/menu/main_menu_screen.dart';
@@ -26,7 +27,10 @@ class PurchaseSummaryRouteArguments {
 }
 
 abstract final class AppRouter {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  static Route<dynamic> onGenerateRoute(
+    RouteSettings settings, {
+    required SaleRepository saleRepository,
+  }) {
     switch (settings.name) {
       case AppRoutes.menuPrincipal:
         return _buildSlideRoute(
@@ -47,21 +51,20 @@ abstract final class AppRouter {
             onBack: () {
               Navigator.of(context).maybePop();
             },
-            onGoToSummary:
-                ({
-                  required products,
-                  required quantitiesByProduct,
-                  required cartSummary,
-                }) {
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.resumenCompra,
-                    arguments: PurchaseSummaryRouteArguments(
-                      products: products,
-                      quantitiesByProduct: quantitiesByProduct,
-                      cartSummary: cartSummary,
-                    ),
-                  );
-                },
+            onGoToSummary: ({
+              required products,
+              required quantitiesByProduct,
+              required cartSummary,
+            }) {
+              Navigator.of(context).pushNamed(
+                AppRoutes.resumenCompra,
+                arguments: PurchaseSummaryRouteArguments(
+                  products: products,
+                  quantitiesByProduct: quantitiesByProduct,
+                  cartSummary: cartSummary,
+                ),
+              );
+            },
           ),
         );
 
@@ -85,6 +88,34 @@ abstract final class AppRouter {
             cartSummary: arguments.cartSummary,
             onBackToProducts: () {
               Navigator.of(context).maybePop();
+            },
+            onConfirmSale: ({
+              required paymentSummary,
+            }) async {
+              final saleId = await saleRepository.guardarVentaCompletada(
+                productos: arguments.products,
+                cantidadesPorProducto: arguments.quantitiesByProduct,
+                resumenCarrito: arguments.cartSummary,
+                resumenCobro: paymentSummary,
+              );
+
+              if (!context.mounted) {
+                return;
+              }
+
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+
+              navigator.popUntil(
+                (route) => route.settings.name == AppRoutes.menuPrincipal,
+              );
+
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text('Venta #$saleId guardada correctamente.'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             },
           ),
         );
@@ -126,14 +157,19 @@ abstract final class AppRouter {
           end: Offset.zero,
         ).animate(curvedAnimation);
 
-        return SlideTransition(position: slideAnimation, child: child);
+        return SlideTransition(
+          position: slideAnimation,
+          child: child,
+        );
       },
     );
   }
 }
 
 class _NavigationErrorScreen extends StatelessWidget {
-  const _NavigationErrorScreen({required this.message});
+  const _NavigationErrorScreen({
+    required this.message,
+  });
 
   final String message;
 
@@ -149,9 +185,9 @@ class _NavigationErrorScreen extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w700,
-              ),
+                    color: AppColors.verdeOscuro,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
           ),
         ),
