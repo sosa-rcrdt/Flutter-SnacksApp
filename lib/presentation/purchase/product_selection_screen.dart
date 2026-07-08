@@ -5,28 +5,80 @@ import '../../core/theme/app_colors.dart';
 import '../../data/local/local_product_catalog.dart';
 import '../../domain/models/product.dart';
 
-class ProductSelectionScreen extends StatelessWidget {
+class ProductSelectionScreen extends StatefulWidget {
   const ProductSelectionScreen({
     super.key,
     this.products,
-    this.quantitiesByProduct = const {},
+    this.initialQuantitiesByProduct = const {},
     this.onBack,
-    this.onIncreaseQuantity,
-    this.onDecreaseQuantity,
     this.onGoToSummary,
   });
 
   final List<Product>? products;
-  final Map<int, int> quantitiesByProduct;
+  final Map<int, int> initialQuantitiesByProduct;
   final VoidCallback? onBack;
-  final ValueChanged<Product>? onIncreaseQuantity;
-  final ValueChanged<Product>? onDecreaseQuantity;
   final VoidCallback? onGoToSummary;
 
   @override
-  Widget build(BuildContext context) {
-    final productsToShow = products ?? LocalProductCatalog.obtenerProductosActivos();
+  State<ProductSelectionScreen> createState() => _ProductSelectionScreenState();
+}
 
+class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
+  late final List<Product> _products;
+  late final Map<int, int> _quantitiesByProduct;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _products = widget.products ?? LocalProductCatalog.obtenerProductosActivos();
+    _quantitiesByProduct = Map<int, int>.from(widget.initialQuantitiesByProduct)
+      ..removeWhere((_, quantity) => quantity <= 0);
+  }
+
+  int get _totalProductCount {
+    return _quantitiesByProduct.values.fold(
+      0,
+      (total, quantity) => total + quantity,
+    );
+  }
+
+  void _increaseQuantity(Product product) {
+    setState(() {
+      final currentQuantity = _quantitiesByProduct[product.id] ?? 0;
+      _quantitiesByProduct[product.id] = currentQuantity + 1;
+    });
+  }
+
+  void _decreaseQuantity(Product product) {
+    final currentQuantity = _quantitiesByProduct[product.id] ?? 0;
+
+    if (currentQuantity <= 0) {
+      return;
+    }
+
+    setState(() {
+      final newQuantity = currentQuantity - 1;
+
+      if (newQuantity == 0) {
+        _quantitiesByProduct.remove(product.id);
+      } else {
+        _quantitiesByProduct[product.id] = newQuantity;
+      }
+    });
+  }
+
+  void _goBack() {
+    if (widget.onBack != null) {
+      widget.onBack!();
+      return;
+    }
+
+    Navigator.of(context).maybePop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.fondoAplicacion,
       body: SafeArea(
@@ -39,28 +91,24 @@ class ProductSelectionScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PurchaseHeader(
-                    onBack: () {
-                      if (onBack != null) {
-                        onBack!();
-                        return;
-                      }
-
-                      Navigator.of(context).maybePop();
-                    },
+                    onBack: _goBack,
                   ),
                   const SizedBox(height: 16),
                   _ProductCatalogSection(
-                    products: productsToShow,
-                    quantitiesByProduct: quantitiesByProduct,
-                    onIncreaseQuantity: onIncreaseQuantity,
-                    onDecreaseQuantity: onDecreaseQuantity,
+                    products: _products,
+                    quantitiesByProduct: _quantitiesByProduct,
+                    onIncreaseQuantity: _increaseQuantity,
+                    onDecreaseQuantity: _decreaseQuantity,
                   ),
                   const SizedBox(height: 16),
-                  const _PartialSummaryCard(),
+                  _PartialSummaryCard(
+                    totalProductCount: _totalProductCount,
+                  ),
                   const SizedBox(height: 16),
                   _GoToSummaryButton(
                     enabled: false,
-                    onPressed: onGoToSummary,
+                    productCount: _totalProductCount,
+                    onPressed: widget.onGoToSummary,
                   ),
                 ],
               ),
@@ -133,8 +181,8 @@ class _ProductCatalogSection extends StatelessWidget {
 
   final List<Product> products;
   final Map<int, int> quantitiesByProduct;
-  final ValueChanged<Product>? onIncreaseQuantity;
-  final ValueChanged<Product>? onDecreaseQuantity;
+  final ValueChanged<Product> onIncreaseQuantity;
+  final ValueChanged<Product> onDecreaseQuantity;
 
   @override
   Widget build(BuildContext context) {
@@ -220,8 +268,8 @@ class _ProductPurchaseCard extends StatelessWidget {
 
   final Product product;
   final int quantity;
-  final ValueChanged<Product>? onIncreaseQuantity;
-  final ValueChanged<Product>? onDecreaseQuantity;
+  final ValueChanged<Product> onIncreaseQuantity;
+  final ValueChanged<Product> onDecreaseQuantity;
 
   @override
   Widget build(BuildContext context) {
@@ -244,10 +292,8 @@ class _ProductPurchaseCard extends StatelessWidget {
             const SizedBox(width: 8),
             _QuantityControls(
               quantity: quantity,
-              canDecrease: quantity > 0 && onDecreaseQuantity != null,
-              canIncrease: onIncreaseQuantity != null,
-              onDecrease: () => onDecreaseQuantity?.call(product),
-              onIncrease: () => onIncreaseQuantity?.call(product),
+              onDecrease: () => onDecreaseQuantity(product),
+              onIncrease: () => onIncreaseQuantity(product),
             ),
           ],
         ),
@@ -333,15 +379,11 @@ class _ProductInfo extends StatelessWidget {
 class _QuantityControls extends StatelessWidget {
   const _QuantityControls({
     required this.quantity,
-    required this.canDecrease,
-    required this.canIncrease,
     required this.onDecrease,
     required this.onIncrease,
   });
 
   final int quantity;
-  final bool canDecrease;
-  final bool canIncrease;
   final VoidCallback onDecrease;
   final VoidCallback onIncrease;
 
@@ -352,7 +394,7 @@ class _QuantityControls extends StatelessWidget {
       children: [
         _QuantityButton(
           text: '-',
-          enabled: canDecrease,
+          enabled: quantity > 0,
           onPressed: onDecrease,
         ),
         SizedBox(
@@ -369,7 +411,7 @@ class _QuantityControls extends StatelessWidget {
         ),
         _QuantityButton(
           text: '+',
-          enabled: canIncrease,
+          enabled: true,
           onPressed: onIncrease,
         ),
       ],
@@ -414,7 +456,11 @@ class _QuantityButton extends StatelessWidget {
 }
 
 class _PartialSummaryCard extends StatelessWidget {
-  const _PartialSummaryCard();
+  const _PartialSummaryCard({
+    required this.totalProductCount,
+  });
+
+  final int totalProductCount;
 
   @override
   Widget build(BuildContext context) {
@@ -424,18 +470,18 @@ class _PartialSummaryCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(22),
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _PartialSummaryTitle(),
-            SizedBox(height: 10),
+            const _PartialSummaryTitle(),
+            const SizedBox(height: 10),
             _PartialSummaryRow(
               label: 'Productos agregados',
-              value: '0',
+              value: totalProductCount.toString(),
             ),
-            SizedBox(height: 6),
-            _PartialSummaryRow(
+            const SizedBox(height: 6),
+            const _PartialSummaryRow(
               label: 'Total parcial',
               value: r'$0.00',
             ),
@@ -503,14 +549,20 @@ class _PartialSummaryRow extends StatelessWidget {
 class _GoToSummaryButton extends StatelessWidget {
   const _GoToSummaryButton({
     required this.enabled,
+    required this.productCount,
     required this.onPressed,
   });
 
   final bool enabled;
+  final int productCount;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final buttonText = productCount > 0
+        ? 'Ver resumen de compra ($productCount)'
+        : 'Ver resumen de compra';
+
     return FilledButton(
       onPressed: enabled ? onPressed : null,
       style: FilledButton.styleFrom(
@@ -527,7 +579,7 @@ class _GoToSummaryButton extends StatelessWidget {
           fontSize: 16,
         ),
       ),
-      child: const Text('Ver resumen de compra'),
+      child: Text(buttonText),
     );
   }
 }
