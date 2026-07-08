@@ -7,12 +7,7 @@ import '../entities/sales_table.dart';
 
 part 'sales_dao.g.dart';
 
-@DriftAccessor(
-  tables: [
-    Sales,
-    SaleDetails,
-  ],
-)
+@DriftAccessor(tables: [Sales, SaleDetails])
 class SalesDao extends DatabaseAccessor<AppDatabase> with _$SalesDaoMixin {
   SalesDao(super.db);
 
@@ -38,9 +33,7 @@ class SalesDao extends DatabaseAccessor<AppDatabase> with _$SalesDaoMixin {
       final saleId = await insertSale(sale);
 
       final detailsWithSaleId = details.map((detail) {
-        return detail.copyWith(
-          ventaId: Value(saleId),
-        );
+        return detail.copyWith(ventaId: Value(saleId));
       }).toList();
 
       await insertSaleDetails(detailsWithSaleId);
@@ -50,22 +43,15 @@ class SalesDao extends DatabaseAccessor<AppDatabase> with _$SalesDaoMixin {
   }
 
   Future<SaleEntity?> getSaleById(int saleId) {
-    final query = select(sales)
-      ..where(
-        (sale) => sale.id.equals(saleId),
-      );
+    final query = select(sales)..where((sale) => sale.id.equals(saleId));
 
     return query.getSingleOrNull();
   }
 
   Future<List<SaleDetailEntity>> getSaleDetailsBySaleId(int saleId) {
     final query = select(saleDetails)
-      ..where(
-        (detail) => detail.ventaId.equals(saleId),
-      )
-      ..orderBy([
-        (detail) => OrderingTerm.asc(detail.id),
-      ]);
+      ..where((detail) => detail.ventaId.equals(saleId))
+      ..orderBy([(detail) => OrderingTerm.asc(detail.id)]);
 
     return query.get();
   }
@@ -75,26 +61,17 @@ class SalesDao extends DatabaseAccessor<AppDatabase> with _$SalesDaoMixin {
     required DateTime end,
   }) {
     final query = select(sales)
-      ..where(
-        (sale) => sale.fechaHora.isBetweenValues(start, end),
-      )
-      ..orderBy([
-        (sale) => OrderingTerm.desc(sale.fechaHora),
-      ]);
+      ..where((sale) => sale.fechaHora.isBetweenValues(start, end))
+      ..orderBy([(sale) => OrderingTerm.desc(sale.fechaHora)]);
 
     return query.get();
   }
 
   Future<void> cancelSale(int saleId) {
-    final query = update(sales)
-      ..where(
-        (sale) => sale.id.equals(saleId),
-      );
+    final query = update(sales)..where((sale) => sale.id.equals(saleId));
 
     return query.write(
-      const SalesCompanion(
-        estado: Value(SaleStatus.cancelada),
-      ),
+      const SalesCompanion(estado: Value(SaleStatus.cancelada)),
     );
   }
 }

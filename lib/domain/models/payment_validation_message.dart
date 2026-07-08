@@ -1,8 +1,4 @@
-enum PaymentValidationType {
-  success,
-  warning,
-  error,
-}
+enum PaymentValidationType { success, warning, error }
 
 class PaymentValidationMessage {
   final String titulo;
@@ -36,10 +32,6 @@ class PaymentValidationMessage {
 
   @override
   int get hashCode {
-    return Object.hash(
-      titulo,
-      descripcion,
-      tipo,
-    );
+    return Object.hash(titulo, descripcion, tipo);
   }
 }

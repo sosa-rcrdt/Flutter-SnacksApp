@@ -5,14 +5,11 @@ class PaymentSummary {
   const PaymentSummary({
     required this.totalCentavos,
     required this.dineroRecibidoCentavos,
-  })  : assert(
-          totalCentavos >= 0,
-          'El total no puede ser negativo.',
-        ),
-        assert(
-          dineroRecibidoCentavos == null || dineroRecibidoCentavos >= 0,
-          'El dinero recibido no puede ser negativo.',
-        );
+  }) : assert(totalCentavos >= 0, 'El total no puede ser negativo.'),
+       assert(
+         dineroRecibidoCentavos == null || dineroRecibidoCentavos >= 0,
+         'El dinero recibido no puede ser negativo.',
+       );
 
   bool get dineroRecibidoValido => dineroRecibidoCentavos != null;
 
@@ -40,10 +37,7 @@ class PaymentSummary {
     return pagoSuficiente && cambioCentavos == 0;
   }
 
-  PaymentSummary copyWith({
-    int? totalCentavos,
-    int? dineroRecibidoCentavos,
-  }) {
+  PaymentSummary copyWith({int? totalCentavos, int? dineroRecibidoCentavos}) {
     return PaymentSummary(
       totalCentavos: totalCentavos ?? this.totalCentavos,
       dineroRecibidoCentavos:
@@ -70,9 +64,6 @@ class PaymentSummary {
 
   @override
   int get hashCode {
-    return Object.hash(
-      totalCentavos,
-      dineroRecibidoCentavos,
-    );
+    return Object.hash(totalCentavos, dineroRecibidoCentavos);
   }
 }

@@ -11,11 +11,7 @@ class SaleDetails extends Table {
 
   IntColumn get ventaId => integer()
       .named('venta_id')
-      .references(
-        Sales,
-        #id,
-        onDelete: KeyAction.cascade,
-      )();
+      .references(Sales, #id, onDelete: KeyAction.cascade)();
 
   IntColumn get productoId => integer().named('producto_id')();
 

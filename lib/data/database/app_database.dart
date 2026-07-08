@@ -8,26 +8,14 @@ import 'entities/sales_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(
-  tables: [
-    Sales,
-    SaleDetails,
-  ],
-  daos: [
-    SalesDao,
-  ],
-)
+@DriftDatabase(tables: [Sales, SaleDetails], daos: [SalesDao])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase({
-    QueryExecutor? executor,
-  }) : super(executor ?? _openConnection());
+  AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 1;
 }
 
 QueryExecutor _openConnection() {
-  return driftDatabase(
-    name: 'los_de_aca_snacks',
-  );
+  return driftDatabase(name: 'los_de_aca_snacks');
 }

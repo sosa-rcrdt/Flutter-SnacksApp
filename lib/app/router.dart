@@ -47,20 +47,21 @@ abstract final class AppRouter {
             onBack: () {
               Navigator.of(context).maybePop();
             },
-            onGoToSummary: ({
-              required products,
-              required quantitiesByProduct,
-              required cartSummary,
-            }) {
-              Navigator.of(context).pushNamed(
-                AppRoutes.resumenCompra,
-                arguments: PurchaseSummaryRouteArguments(
-                  products: products,
-                  quantitiesByProduct: quantitiesByProduct,
-                  cartSummary: cartSummary,
-                ),
-              );
-            },
+            onGoToSummary:
+                ({
+                  required products,
+                  required quantitiesByProduct,
+                  required cartSummary,
+                }) {
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.resumenCompra,
+                    arguments: PurchaseSummaryRouteArguments(
+                      products: products,
+                      quantitiesByProduct: quantitiesByProduct,
+                      cartSummary: cartSummary,
+                    ),
+                  );
+                },
           ),
         );
 
@@ -99,13 +100,13 @@ abstract final class AppRouter {
   }
 
   static PageRouteBuilder<dynamic> _buildSlideRoute({
-  required RouteSettings settings,
-  required WidgetBuilder childBuilder,
-  Duration transitionDuration = const Duration(milliseconds: 260),
-  Duration reverseTransitionDuration = const Duration(milliseconds: 220),
-  Curve curve = Curves.easeOutCubic,
-  Curve reverseCurve = Curves.easeInCubic,
-}) {
+    required RouteSettings settings,
+    required WidgetBuilder childBuilder,
+    Duration transitionDuration = const Duration(milliseconds: 260),
+    Duration reverseTransitionDuration = const Duration(milliseconds: 220),
+    Curve curve = Curves.easeOutCubic,
+    Curve reverseCurve = Curves.easeInCubic,
+  }) {
     return PageRouteBuilder(
       settings: settings,
       transitionDuration: transitionDuration,
@@ -125,19 +126,14 @@ abstract final class AppRouter {
           end: Offset.zero,
         ).animate(curvedAnimation);
 
-        return SlideTransition(
-          position: slideAnimation,
-          child: child,
-        );
+        return SlideTransition(position: slideAnimation, child: child);
       },
     );
   }
 }
 
 class _NavigationErrorScreen extends StatelessWidget {
-  const _NavigationErrorScreen({
-    required this.message,
-  });
+  const _NavigationErrorScreen({required this.message});
 
   final String message;
 
@@ -153,9 +149,9 @@ class _NavigationErrorScreen extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

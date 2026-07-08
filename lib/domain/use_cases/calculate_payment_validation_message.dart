@@ -28,7 +28,8 @@ abstract final class CalculatePaymentValidationMessage {
     if (!paymentSummary.dineroRecibidoValido) {
       return const PaymentValidationMessage(
         titulo: 'Cantidad no válida',
-        descripcion: 'Usa solo números y máximo dos decimales. Ejemplo: 150 o 150.50.',
+        descripcion:
+            'Usa solo números y máximo dos decimales. Ejemplo: 150 o 150.50.',
         tipo: PaymentValidationType.error,
       );
     }
@@ -36,7 +37,8 @@ abstract final class CalculatePaymentValidationMessage {
     if (!paymentSummary.pagoSuficiente) {
       return PaymentValidationMessage(
         titulo: 'Pago insuficiente',
-        descripcion: 'Faltan ${formatearCentavosComoPesos(paymentSummary.faltanteCentavos)} para completar el pago.',
+        descripcion:
+            'Faltan ${formatearCentavosComoPesos(paymentSummary.faltanteCentavos)} para completar el pago.',
         tipo: PaymentValidationType.error,
       );
     }
@@ -44,14 +46,16 @@ abstract final class CalculatePaymentValidationMessage {
     if (paymentSummary.pagoExacto) {
       return const PaymentValidationMessage(
         titulo: 'Pago exacto',
-        descripcion: 'El cliente entregó la cantidad exacta. Puedes confirmar la venta.',
+        descripcion:
+            'El cliente entregó la cantidad exacta. Puedes confirmar la venta.',
         tipo: PaymentValidationType.success,
       );
     }
 
     return PaymentValidationMessage(
       titulo: 'Pago suficiente',
-      descripcion: 'Entrega ${formatearCentavosComoPesos(paymentSummary.cambioCentavos)} de cambio al cliente.',
+      descripcion:
+          'Entrega ${formatearCentavosComoPesos(paymentSummary.cambioCentavos)} de cambio al cliente.',
       tipo: PaymentValidationType.success,
     );
   }

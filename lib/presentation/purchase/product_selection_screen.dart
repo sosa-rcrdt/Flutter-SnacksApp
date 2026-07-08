@@ -7,11 +7,12 @@ import '../../domain/models/cart_summary.dart';
 import '../../domain/models/product.dart';
 import '../../domain/use_cases/calculate_cart_summary.dart';
 
-typedef GoToPurchaseSummary = void Function({
-  required List<Product> products,
-  required Map<int, int> quantitiesByProduct,
-  required CartSummary cartSummary,
-});
+typedef GoToPurchaseSummary =
+    void Function({
+      required List<Product> products,
+      required Map<int, int> quantitiesByProduct,
+      required CartSummary cartSummary,
+    });
 
 class ProductSelectionScreen extends StatefulWidget {
   const ProductSelectionScreen({
@@ -39,7 +40,8 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
   void initState() {
     super.initState();
 
-    _products = widget.products ?? LocalProductCatalog.obtenerProductosActivos();
+    _products =
+        widget.products ?? LocalProductCatalog.obtenerProductosActivos();
     _quantitiesByProduct = Map<int, int>.from(widget.initialQuantitiesByProduct)
       ..removeWhere((_, quantity) => quantity <= 0);
   }
@@ -94,9 +96,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'La pantalla de resumen todavía no está conectada.',
-        ),
+        content: Text('La pantalla de resumen todavía no está conectada.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -120,9 +120,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _PurchaseHeader(
-                    onBack: _goBack,
-                  ),
+                  _PurchaseHeader(onBack: _goBack),
                   const SizedBox(height: 16),
                   _ProductCatalogSection(
                     products: _products,
@@ -131,9 +129,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                     onDecreaseQuantity: _decreaseQuantity,
                   ),
                   const SizedBox(height: 16),
-                  _PartialSummaryCard(
-                    cartSummary: cartSummary,
-                  ),
+                  _PartialSummaryCard(cartSummary: cartSummary),
                   const SizedBox(height: 16),
                   _GoToSummaryButton(
                     cartSummary: cartSummary,
@@ -150,9 +146,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
 }
 
 class _PurchaseHeader extends StatelessWidget {
-  const _PurchaseHeader({
-    required this.onBack,
-  });
+  const _PurchaseHeader({required this.onBack});
 
   final VoidCallback onBack;
 
@@ -163,41 +157,33 @@ class _PurchaseHeader extends StatelessWidget {
       children: [
         FilledButton.icon(
           onPressed: onBack,
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_rounded, size: 20),
           label: const Text('Menú principal'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.verdeOscuro,
             foregroundColor: AppColors.amarilloMaiz,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
+            textStyle: const TextStyle(fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(height: 16),
         Text(
           'Seleccionar productos',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w800,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           'Agrega al carrito los productos que se venderán.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdePrincipal,
-                fontWeight: FontWeight.w500,
-              ),
+            color: AppColors.verdePrincipal,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );
@@ -222,9 +208,7 @@ class _ProductCatalogSection extends StatelessWidget {
     return Card(
       color: AppColors.tarjetaMenu,
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -233,18 +217,18 @@ class _ProductCatalogSection extends StatelessWidget {
             Text(
               'Productos',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 3),
             Text(
               'Catálogo disponible para registrar una compra.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.verdePrincipal,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                  ),
+                color: AppColors.verdePrincipal,
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
             ),
             const SizedBox(height: 14),
             if (products.isEmpty)
@@ -274,17 +258,15 @@ class _EmptyCatalogMessage extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Text(
           'Todavía no hay productos disponibles.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdePrincipal,
-                fontWeight: FontWeight.w500,
-              ),
+            color: AppColors.verdePrincipal,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -309,9 +291,7 @@ class _ProductPurchaseCard extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: Row(
@@ -319,9 +299,7 @@ class _ProductPurchaseCard extends StatelessWidget {
           children: [
             const _GenericProductImage(),
             const SizedBox(width: 10),
-            Expanded(
-              child: _ProductInfo(product: product),
-            ),
+            Expanded(child: _ProductInfo(product: product)),
             const SizedBox(width: 8),
             _QuantityControls(
               quantity: quantity,
@@ -343,27 +321,18 @@ class _GenericProductImage extends StatelessWidget {
     return Card(
       color: AppColors.fondoAplicacion,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       child: const SizedBox(
         width: 50,
         height: 50,
-        child: Center(
-          child: Text(
-            '🌽',
-            style: TextStyle(fontSize: 24),
-          ),
-        ),
+        child: Center(child: Text('🌽', style: TextStyle(fontSize: 24))),
       ),
     );
   }
 }
 
 class _ProductInfo extends StatelessWidget {
-  const _ProductInfo({
-    required this.product,
-  });
+  const _ProductInfo({required this.product});
 
   final Product product;
 
@@ -377,11 +346,11 @@ class _ProductInfo extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                height: 1.12,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: FontWeight.w800,
+            fontSize: 14,
+            height: 1.12,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
@@ -389,20 +358,20 @@ class _ProductInfo extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.verdePrincipal,
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
-                height: 1.1,
-              ),
+            color: AppColors.verdePrincipal,
+            fontWeight: FontWeight.w500,
+            fontSize: 11,
+            height: 1.1,
+          ),
         ),
         const SizedBox(height: 3),
         Text(
           formatearCentavosComoPesos(product.precioCentavos),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: FontWeight.w800,
+            fontSize: 13,
+          ),
         ),
       ],
     );
@@ -436,17 +405,13 @@ class _QuantityControls extends StatelessWidget {
             quantity.toString(),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.verdeOscuro,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 14,
-                ),
+              color: AppColors.verdeOscuro,
+              fontWeight: FontWeight.w800,
+              fontSize: 14,
+            ),
           ),
         ),
-        _QuantityButton(
-          text: '+',
-          enabled: true,
-          onPressed: onIncrease,
-        ),
+        _QuantityButton(text: '+', enabled: true, onPressed: onIncrease),
       ],
     );
   }
@@ -475,13 +440,8 @@ class _QuantityButton extends StatelessWidget {
         minimumSize: const Size(32, 32),
         fixedSize: const Size(32, 32),
         padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(11),
-        ),
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: 15,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
       ),
       child: Text(text),
     );
@@ -489,9 +449,7 @@ class _QuantityButton extends StatelessWidget {
 }
 
 class _PartialSummaryCard extends StatelessWidget {
-  const _PartialSummaryCard({
-    required this.cartSummary,
-  });
+  const _PartialSummaryCard({required this.cartSummary});
 
   final CartSummary cartSummary;
 
@@ -500,9 +458,7 @@ class _PartialSummaryCard extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -535,19 +491,16 @@ class _PartialSummaryTitle extends StatelessWidget {
       child: Text(
         'Carrito actual',
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppColors.verdeOscuro,
-              fontWeight: FontWeight.w800,
-            ),
+          color: AppColors.verdeOscuro,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     );
   }
 }
 
 class _PartialSummaryRow extends StatelessWidget {
-  const _PartialSummaryRow({
-    required this.label,
-    required this.value,
-  });
+  const _PartialSummaryRow({required this.label, required this.value});
 
   final String label;
   final String value;
@@ -561,18 +514,18 @@ class _PartialSummaryRow extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.verdePrincipal,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: AppColors.verdePrincipal,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(width: 16),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w800,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ],
     );
@@ -602,13 +555,8 @@ class _GoToSummaryButton extends StatelessWidget {
         disabledBackgroundColor: AppColors.botonDeshabilitado,
         disabledForegroundColor: AppColors.textoDeshabilitado,
         minimumSize: const Size.fromHeight(48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
       ),
       child: Text(buttonText),
     );

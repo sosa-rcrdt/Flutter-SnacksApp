@@ -3,10 +3,14 @@ import '../../domain/models/product_category.dart';
 
 abstract final class LocalProductCatalog {
   static List<Product> obtenerProductosActivos() {
-    final productosActivos = _productos.where((producto) => producto.estaActivo).toList();
+    final productosActivos = _productos
+        .where((producto) => producto.estaActivo)
+        .toList();
 
     productosActivos.sort((a, b) {
-      final comparacionCategoria = a.categoria.orden.compareTo(b.categoria.orden);
+      final comparacionCategoria = a.categoria.orden.compareTo(
+        b.categoria.orden,
+      );
 
       if (comparacionCategoria != 0) {
         return comparacionCategoria;

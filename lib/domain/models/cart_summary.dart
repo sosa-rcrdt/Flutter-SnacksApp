@@ -5,26 +5,20 @@ class CartSummary {
   const CartSummary({
     required this.cantidadTotalProductos,
     required this.totalCentavos,
-  })  : assert(
-          cantidadTotalProductos >= 0,
-          'La cantidad total de productos no puede ser negativa.',
-        ),
-        assert(
-          totalCentavos >= 0,
-          'El total del carrito no puede ser negativo.',
-        );
+  }) : assert(
+         cantidadTotalProductos >= 0,
+         'La cantidad total de productos no puede ser negativa.',
+       ),
+       assert(
+         totalCentavos >= 0,
+         'El total del carrito no puede ser negativo.',
+       );
 
-  static const empty = CartSummary(
-    cantidadTotalProductos: 0,
-    totalCentavos: 0,
-  );
+  static const empty = CartSummary(cantidadTotalProductos: 0, totalCentavos: 0);
 
   bool get estaVacio => cantidadTotalProductos == 0;
 
-  CartSummary copyWith({
-    int? cantidadTotalProductos,
-    int? totalCentavos,
-  }) {
+  CartSummary copyWith({int? cantidadTotalProductos, int? totalCentavos}) {
     return CartSummary(
       cantidadTotalProductos:
           cantidadTotalProductos ?? this.cantidadTotalProductos,
@@ -51,9 +45,6 @@ class CartSummary {
 
   @override
   int get hashCode {
-    return Object.hash(
-      cantidadTotalProductos,
-      totalCentavos,
-    );
+    return Object.hash(cantidadTotalProductos, totalCentavos);
   }
 }
