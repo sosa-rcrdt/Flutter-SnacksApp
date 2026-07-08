@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/format/money_format.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/local/local_product_catalog.dart';
 import '../../domain/models/product.dart';
-import '../../domain/models/product_category.dart';
 
 class ProductSelectionScreen extends StatelessWidget {
   const ProductSelectionScreen({
@@ -25,43 +25,45 @@ class ProductSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productsToShow = products ?? _sampleProductsForLayout();
+    final productsToShow = products ?? LocalProductCatalog.obtenerProductosActivos();
 
     return Scaffold(
       backgroundColor: AppColors.fondoAplicacion,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _PurchaseHeader(
-                  onBack: () {
-                    if (onBack != null) {
-                      onBack!();
-                      return;
-                    }
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _PurchaseHeader(
+                    onBack: () {
+                      if (onBack != null) {
+                        onBack!();
+                        return;
+                      }
 
-                    Navigator.of(context).maybePop();
-                  },
-                ),
-                const SizedBox(height: 16),
-                _ProductCatalogSection(
-                  products: productsToShow,
-                  quantitiesByProduct: quantitiesByProduct,
-                  onIncreaseQuantity: onIncreaseQuantity,
-                  onDecreaseQuantity: onDecreaseQuantity,
-                ),
-                const SizedBox(height: 16),
-                const _PartialSummaryCard(),
-                const SizedBox(height: 16),
-                _GoToSummaryButton(
-                  enabled: false,
-                  onPressed: onGoToSummary,
-                ),
-              ],
+                      Navigator.of(context).maybePop();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _ProductCatalogSection(
+                    products: productsToShow,
+                    quantitiesByProduct: quantitiesByProduct,
+                    onIncreaseQuantity: onIncreaseQuantity,
+                    onDecreaseQuantity: onDecreaseQuantity,
+                  ),
+                  const SizedBox(height: 16),
+                  const _PartialSummaryCard(),
+                  const SizedBox(height: 16),
+                  _GoToSummaryButton(
+                    enabled: false,
+                    onPressed: onGoToSummary,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -98,7 +100,7 @@ class _PurchaseHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          child: const Text('Menú principal'),
+          child: const Text('← Menú principal'),
         ),
         const SizedBox(height: 16),
         Text(
@@ -143,26 +145,27 @@ class _ProductCatalogSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               'Productos',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                   ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               'Catálogo disponible para registrar una compra.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.verdePrincipal,
                     fontWeight: FontWeight.w500,
+                    fontSize: 12,
                   ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             if (products.isEmpty)
               const _EmptyCatalogMessage()
             else
@@ -173,7 +176,7 @@ class _ProductCatalogSection extends StatelessWidget {
                   onIncreaseQuantity: onIncreaseQuantity,
                   onDecreaseQuantity: onDecreaseQuantity,
                 ),
-                if (index < products.length - 1) const SizedBox(height: 10),
+                if (index < products.length - 1) const SizedBox(height: 8),
               ],
           ],
         ),
@@ -229,16 +232,16 @@ class _ProductPurchaseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const _GenericProductImage(),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _ProductInfo(product: product),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             _QuantityControls(
               quantity: quantity,
               canDecrease: quantity > 0 && onDecreaseQuantity != null,
@@ -265,12 +268,12 @@ class _GenericProductImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: const SizedBox(
-        width: 58,
-        height: 58,
+        width: 50,
+        height: 50,
         child: Center(
           child: Text(
             '🌽',
-            style: TextStyle(fontSize: 28),
+            style: TextStyle(fontSize: 24),
           ),
         ),
       ),
@@ -294,9 +297,11 @@ class _ProductInfo extends StatelessWidget {
           product.nombre,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppColors.verdeOscuro,
                 fontWeight: FontWeight.w800,
+                fontSize: 14,
+                height: 1.12,
               ),
         ),
         const SizedBox(height: 2),
@@ -307,14 +312,17 @@ class _ProductInfo extends StatelessWidget {
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.verdePrincipal,
                 fontWeight: FontWeight.w500,
+                fontSize: 11,
+                height: 1.1,
               ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           formatearCentavosComoPesos(product.precioCentavos),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
               ),
         ),
       ],
@@ -348,13 +356,14 @@ class _QuantityControls extends StatelessWidget {
           onPressed: onDecrease,
         ),
         SizedBox(
-          width: 36,
+          width: 30,
           child: Text(
             quantity.toString(),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   color: AppColors.verdeOscuro,
                   fontWeight: FontWeight.w800,
+                  fontSize: 14,
                 ),
           ),
         ),
@@ -388,15 +397,15 @@ class _QuantityButton extends StatelessWidget {
         foregroundColor: AppColors.verdeOscuro,
         disabledBackgroundColor: AppColors.botonDeshabilitado,
         disabledForegroundColor: AppColors.textoDeshabilitado,
-        minimumSize: const Size(36, 36),
-        fixedSize: const Size(36, 36),
+        minimumSize: const Size(32, 32),
+        fixedSize: const Size(32, 32),
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(11),
         ),
         textStyle: const TextStyle(
           fontWeight: FontWeight.w800,
-          fontSize: 16,
+          fontSize: 15,
         ),
       ),
       child: Text(text),
@@ -521,33 +530,4 @@ class _GoToSummaryButton extends StatelessWidget {
       child: const Text('Ver resumen de compra'),
     );
   }
-}
-
-List<Product> _sampleProductsForLayout() {
-  return [
-    Product(
-      id: 1,
-      nombre: 'Elote',
-      precioCentavos: 3000,
-      categoria: ProductCategory.elotesYEsquites,
-    ),
-    Product(
-      id: 2,
-      nombre: 'Esquite mediano',
-      precioCentavos: 3500,
-      categoria: ProductCategory.elotesYEsquites,
-    ),
-    Product(
-      id: 3,
-      nombre: 'Doriesquite',
-      precioCentavos: 6000,
-      categoria: ProductCategory.snacksPreparados,
-    ),
-    Product(
-      id: 4,
-      nombre: 'Arizona preparado',
-      precioCentavos: 4000,
-      categoria: ProductCategory.bebidas,
-    ),
-  ];
 }

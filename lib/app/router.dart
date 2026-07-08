@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../presentation/menu/main_menu_screen.dart';
 
+import '../presentation/purchase/product_selection_screen.dart';
+
 abstract final class AppRoutes {
   static const String menuPrincipal = '/';
 }
@@ -11,7 +13,7 @@ abstract final class AppRouter {
     switch (settings.name) {
       case AppRoutes.menuPrincipal:
         return MaterialPageRoute(
-          builder: (_) => const MainMenuScreen(),
+          builder: (_) => const ProductSelectionScreen(),
           settings: settings,
         );
 
