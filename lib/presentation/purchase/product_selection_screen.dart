@@ -7,6 +7,12 @@ import '../../domain/models/cart_summary.dart';
 import '../../domain/models/product.dart';
 import '../../domain/use_cases/calculate_cart_summary.dart';
 
+typedef GoToPurchaseSummary = void Function({
+  required List<Product> products,
+  required Map<int, int> quantitiesByProduct,
+  required CartSummary cartSummary,
+});
+
 class ProductSelectionScreen extends StatefulWidget {
   const ProductSelectionScreen({
     super.key,
@@ -19,7 +25,7 @@ class ProductSelectionScreen extends StatefulWidget {
   final List<Product>? products;
   final Map<int, int> initialQuantitiesByProduct;
   final VoidCallback? onBack;
-  final VoidCallback? onGoToSummary;
+  final GoToPurchaseSummary? onGoToSummary;
 
   @override
   State<ProductSelectionScreen> createState() => _ProductSelectionScreenState();
@@ -72,16 +78,24 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
     Navigator.of(context).maybePop();
   }
 
-  void _goToSummary() {
+  void _goToSummary(CartSummary cartSummary) {
+    if (cartSummary.estaVacio) {
+      return;
+    }
+
     if (widget.onGoToSummary != null) {
-      widget.onGoToSummary!();
+      widget.onGoToSummary!(
+        products: List<Product>.unmodifiable(_products),
+        quantitiesByProduct: Map<int, int>.unmodifiable(_quantitiesByProduct),
+        cartSummary: cartSummary,
+      );
       return;
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
-          'La pantalla de resumen se agregará en un próximo commit.',
+          'La pantalla de resumen todavía no está conectada.',
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -123,7 +137,7 @@ class _ProductSelectionScreenState extends State<ProductSelectionScreen> {
                   const SizedBox(height: 16),
                   _GoToSummaryButton(
                     cartSummary: cartSummary,
-                    onPressed: _goToSummary,
+                    onPressed: () => _goToSummary(cartSummary),
                   ),
                 ],
               ),
@@ -147,8 +161,13 @@ class _PurchaseHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FilledButton(
+        FilledButton.icon(
           onPressed: onBack,
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            size: 20,
+          ),
+          label: const Text('Menú principal'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.verdeOscuro,
             foregroundColor: AppColors.amarilloMaiz,
@@ -163,7 +182,6 @@ class _PurchaseHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          child: const Text('Menú principal'),
         ),
         const SizedBox(height: 16),
         Text(

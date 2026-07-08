@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
 class MainMenuScreen extends StatelessWidget {
-  const MainMenuScreen({super.key});
+  const MainMenuScreen({
+    super.key,
+    this.onStartPurchase,
+  });
+
+  final VoidCallback? onStartPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -15,15 +20,17 @@ class MainMenuScreen extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 520),
-              child: const Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  _MainLogo(),
-                  SizedBox(height: 8),
-                  _MainDescription(),
-                  SizedBox(height: 32),
-                  _MainMenuCard(),
+                  const _MainLogo(),
+                  const SizedBox(height: 8),
+                  const _MainDescription(),
+                  const SizedBox(height: 32),
+                  _MainMenuCard(
+                    onStartPurchase: onStartPurchase,
+                  ),
                 ],
               ),
             ),
@@ -58,15 +65,19 @@ class _MainDescription extends StatelessWidget {
       'Sistema de ventas para elotes y snacks',
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-        color: AppColors.verdePrincipal,
-        fontWeight: FontWeight.w500,
-      ),
+            color: AppColors.verdePrincipal,
+            fontWeight: FontWeight.w500,
+          ),
     );
   }
 }
 
 class _MainMenuCard extends StatelessWidget {
-  const _MainMenuCard();
+  const _MainMenuCard({
+    required this.onStartPurchase,
+  });
+
+  final VoidCallback? onStartPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +85,9 @@ class _MainMenuCard extends StatelessWidget {
       color: AppColors.tarjetaMenu,
       elevation: 4,
       shadowColor: Colors.black.withValues(alpha: 0.16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -83,17 +96,22 @@ class _MainMenuCard extends StatelessWidget {
             Text(
               'Menú principal',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w700,
-              ),
+                    color: AppColors.verdeOscuro,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () {
+                if (onStartPurchase != null) {
+                  onStartPurchase!();
+                  return;
+                }
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(
-                      'La pantalla de compra se agregará en un próximo commit.',
+                      'La pantalla de compra todavía no está conectada.',
                     ),
                     behavior: SnackBarBehavior.floating,
                   ),

@@ -142,8 +142,13 @@ class _SummaryHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FilledButton(
+        FilledButton.icon(
           onPressed: onBackToProducts,
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            size: 20,
+          ),
+          label: const Text('Productos'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.verdeOscuro,
             foregroundColor: AppColors.amarilloMaiz,
@@ -158,7 +163,6 @@ class _SummaryHeader extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          child: const Text('← Productos'),
         ),
         const SizedBox(height: 16),
         Text(
