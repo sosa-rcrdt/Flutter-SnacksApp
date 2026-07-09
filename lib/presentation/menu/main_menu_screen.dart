@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
 class MainMenuScreen extends StatelessWidget {
-  const MainMenuScreen({super.key, this.onStartPurchase});
+  const MainMenuScreen({
+    super.key,
+    this.onStartPurchase,
+    this.onViewDailySales,
+  });
 
   final VoidCallback? onStartPurchase;
+  final VoidCallback? onViewDailySales;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +30,10 @@ class MainMenuScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   const _MainDescription(),
                   const SizedBox(height: 32),
-                  _MainMenuCard(onStartPurchase: onStartPurchase),
+                  _MainMenuCard(
+                    onStartPurchase: onStartPurchase,
+                    onViewDailySales: onViewDailySales,
+                  ),
                 ],
               ),
             ),
@@ -68,9 +76,13 @@ class _MainDescription extends StatelessWidget {
 }
 
 class _MainMenuCard extends StatelessWidget {
-  const _MainMenuCard({required this.onStartPurchase});
+  const _MainMenuCard({
+    required this.onStartPurchase,
+    required this.onViewDailySales,
+  });
 
   final VoidCallback? onStartPurchase;
+  final VoidCallback? onViewDailySales;
 
   @override
   Widget build(BuildContext context) {
@@ -124,16 +136,30 @@ class _MainMenuCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             FilledButton(
-              onPressed: null,
+              onPressed: () {
+                if (onViewDailySales != null) {
+                  onViewDailySales!();
+                  return;
+                }
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'La pantalla de ventas todavía no está conectada.',
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
               style: FilledButton.styleFrom(
-                disabledBackgroundColor: AppColors.botonDeshabilitado,
-                disabledForegroundColor: AppColors.textoDeshabilitado,
+                backgroundColor: AppColors.verdeOscuro,
+                foregroundColor: AppColors.amarilloMaiz,
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
                 textStyle: const TextStyle(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                   fontSize: 16,
                 ),
               ),

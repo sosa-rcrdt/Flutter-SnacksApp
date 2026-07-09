@@ -7,11 +7,15 @@ import '../domain/models/product.dart';
 import '../presentation/menu/main_menu_screen.dart';
 import '../presentation/purchase/product_selection_screen.dart';
 import '../presentation/purchase/purchase_summary_screen.dart';
+import '../presentation/purchase/sale_success_screen.dart';
+import '../presentation/sales/daily_sales_screen.dart';
 
 abstract final class AppRoutes {
   static const String menuPrincipal = '/';
   static const String seleccionProductos = '/seleccion-productos';
   static const String resumenCompra = '/resumen-compra';
+  static const String ventasDelDia = '/ventas-del-dia';
+  static const String operacionExitosa = '/operacion-exitosa';
 }
 
 class PurchaseSummaryRouteArguments {
@@ -39,6 +43,9 @@ abstract final class AppRouter {
             onStartPurchase: () {
               Navigator.of(context).pushNamed(AppRoutes.seleccionProductos);
             },
+            onViewDailySales: () {
+              Navigator.of(context).pushNamed(AppRoutes.ventasDelDia);
+            },
           ),
         );
 
@@ -51,20 +58,21 @@ abstract final class AppRouter {
             onBack: () {
               Navigator.of(context).maybePop();
             },
-            onGoToSummary: ({
-              required products,
-              required quantitiesByProduct,
-              required cartSummary,
-            }) {
-              Navigator.of(context).pushNamed(
-                AppRoutes.resumenCompra,
-                arguments: PurchaseSummaryRouteArguments(
-                  products: products,
-                  quantitiesByProduct: quantitiesByProduct,
-                  cartSummary: cartSummary,
-                ),
-              );
-            },
+            onGoToSummary:
+                ({
+                  required products,
+                  required quantitiesByProduct,
+                  required cartSummary,
+                }) {
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.resumenCompra,
+                    arguments: PurchaseSummaryRouteArguments(
+                      products: products,
+                      quantitiesByProduct: quantitiesByProduct,
+                      cartSummary: cartSummary,
+                    ),
+                  );
+                },
           ),
         );
 
@@ -89,10 +97,8 @@ abstract final class AppRouter {
             onBackToProducts: () {
               Navigator.of(context).maybePop();
             },
-            onConfirmSale: ({
-              required paymentSummary,
-            }) async {
-              final saleId = await saleRepository.guardarVentaCompletada(
+            onConfirmSale: ({required paymentSummary}) async {
+              await saleRepository.guardarVentaCompletada(
                 productos: arguments.products,
                 cantidadesPorProducto: arguments.quantitiesByProduct,
                 resumenCarrito: arguments.cartSummary,
@@ -103,19 +109,40 @@ abstract final class AppRouter {
                 return;
               }
 
-              final navigator = Navigator.of(context);
-              final messenger = ScaffoldMessenger.of(context);
-
-              navigator.popUntil(
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.operacionExitosa,
                 (route) => route.settings.name == AppRoutes.menuPrincipal,
               );
+            },
+          ),
+        );
 
-              messenger.showSnackBar(
-                SnackBar(
-                  content: Text('Venta #$saleId guardada correctamente.'),
-                  behavior: SnackBarBehavior.floating,
-                ),
+      case AppRoutes.operacionExitosa:
+        return _buildSlideRoute(
+          settings: settings,
+          childBuilder: (context) => SaleSuccessScreen(
+            onGoToMenu: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.menuPrincipal,
+                (route) => false,
               );
+            },
+            onStartNewPurchase: () {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoutes.seleccionProductos,
+                (route) => route.settings.name == AppRoutes.menuPrincipal,
+              );
+            },
+          ),
+        );
+
+      case AppRoutes.ventasDelDia:
+        return _buildSlideRoute(
+          settings: settings,
+          childBuilder: (context) => DailySalesScreen(
+            saleRepository: saleRepository,
+            onBackToMenu: () {
+              Navigator.of(context).maybePop();
             },
           ),
         );
@@ -157,19 +184,14 @@ abstract final class AppRouter {
           end: Offset.zero,
         ).animate(curvedAnimation);
 
-        return SlideTransition(
-          position: slideAnimation,
-          child: child,
-        );
+        return SlideTransition(position: slideAnimation, child: child);
       },
     );
   }
 }
 
 class _NavigationErrorScreen extends StatelessWidget {
-  const _NavigationErrorScreen({
-    required this.message,
-  });
+  const _NavigationErrorScreen({required this.message});
 
   final String message;
 
@@ -185,9 +207,9 @@ class _NavigationErrorScreen extends StatelessWidget {
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w700,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

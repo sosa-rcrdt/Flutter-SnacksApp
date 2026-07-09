@@ -9,9 +9,8 @@ import '../../domain/models/product.dart';
 import '../../domain/use_cases/calculate_payment_summary.dart';
 import '../../domain/use_cases/calculate_payment_validation_message.dart';
 
-typedef ConfirmCompletedSale = Future<void> Function({
-  required PaymentSummary paymentSummary,
-});
+typedef ConfirmCompletedSale =
+    Future<void> Function({required PaymentSummary paymentSummary});
 
 class PurchaseSummaryScreen extends StatefulWidget {
   const PurchaseSummaryScreen({
@@ -76,9 +75,7 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
 
     try {
       if (widget.onConfirmSale != null) {
-        await widget.onConfirmSale!(
-          paymentSummary: paymentSummary,
-        );
+        await widget.onConfirmSale!(paymentSummary: paymentSummary);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -96,9 +93,7 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'No se pudo guardar la venta. Intenta nuevamente.',
-          ),
+          content: Text('No se pudo guardar la venta. Intenta nuevamente.'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -139,9 +134,7 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _SummaryHeader(
-                    onBackToProducts: _backToProducts,
-                  ),
+                  _SummaryHeader(onBackToProducts: _backToProducts),
                   const SizedBox(height: 16),
                   _SelectedProductsSection(
                     selectedProducts: _selectedProducts,
@@ -173,9 +166,7 @@ class _PurchaseSummaryScreenState extends State<PurchaseSummaryScreen> {
 }
 
 class _SummaryHeader extends StatelessWidget {
-  const _SummaryHeader({
-    required this.onBackToProducts,
-  });
+  const _SummaryHeader({required this.onBackToProducts});
 
   final VoidCallback onBackToProducts;
 
@@ -186,41 +177,33 @@ class _SummaryHeader extends StatelessWidget {
       children: [
         FilledButton.icon(
           onPressed: onBackToProducts,
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back_rounded, size: 20),
           label: const Text('Productos'),
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.verdeOscuro,
             foregroundColor: AppColors.amarilloMaiz,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(50),
             ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-            ),
+            textStyle: const TextStyle(fontWeight: FontWeight.w700),
           ),
         ),
         const SizedBox(height: 16),
         Text(
           'Resumen de compra',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w800,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           'Revisa los productos seleccionados y calcula el cambio.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdePrincipal,
-                fontWeight: FontWeight.w500,
-              ),
+            color: AppColors.verdePrincipal,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );
@@ -243,9 +226,7 @@ class _SelectedProductsSection extends StatelessWidget {
     return Card(
       color: AppColors.tarjetaMenu,
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -254,9 +235,9 @@ class _SelectedProductsSection extends StatelessWidget {
             Text(
               'Productos seleccionados',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 12),
             if (selectedProducts.isEmpty)
@@ -295,17 +276,15 @@ class _EmptySummaryMessage extends StatelessWidget {
     return Card(
       color: AppColors.fondoAdvertencia,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Text(
           'No hay productos seleccionados.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.advertencia,
-                fontWeight: FontWeight.w700,
-              ),
+            color: AppColors.advertencia,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
     );
@@ -313,10 +292,7 @@ class _EmptySummaryMessage extends StatelessWidget {
 }
 
 class _SelectedProductRow extends StatelessWidget {
-  const _SelectedProductRow({
-    required this.product,
-    required this.quantity,
-  });
+  const _SelectedProductRow({required this.product, required this.quantity});
 
   final Product product;
   final int quantity;
@@ -328,9 +304,7 @@ class _SelectedProductRow extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
@@ -342,17 +316,17 @@ class _SelectedProductRow extends StatelessWidget {
                   Text(
                     product.nombre,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.verdeOscuro,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      color: AppColors.verdeOscuro,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     '$quantity x ${formatearCentavosComoPesos(product.precioCentavos)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.verdePrincipal,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: AppColors.verdePrincipal,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -361,9 +335,9 @@ class _SelectedProductRow extends StatelessWidget {
             Text(
               formatearCentavosComoPesos(subtotalCentavos),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ],
         ),
@@ -396,9 +370,7 @@ class _PaymentSection extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -407,9 +379,9 @@ class _PaymentSection extends StatelessWidget {
             Text(
               'Cobro',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 14),
             TextField(
@@ -424,7 +396,8 @@ class _PaymentSection extends StatelessWidget {
                 hintText: 'Ej. 200',
                 filled: true,
                 fillColor: AppColors.fondoAplicacion,
-                errorText: controller.text.trim().isNotEmpty &&
+                errorText:
+                    controller.text.trim().isNotEmpty &&
                         !paymentSummary.dineroRecibidoValido
                     ? 'Cantidad no válida'
                     : null,
@@ -434,19 +407,14 @@ class _PaymentSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            _ValidationMessageCard(
-              message: validationMessage,
-            ),
+            _ValidationMessageCard(message: validationMessage),
             const SizedBox(height: 16),
             _SummaryRow(
               label: 'Total a pagar',
               value: formatearCentavosComoPesos(paymentSummary.totalCentavos),
             ),
             const SizedBox(height: 8),
-            _SummaryRow(
-              label: 'Dinero recibido',
-              value: dineroRecibidoTexto,
-            ),
+            _SummaryRow(label: 'Dinero recibido', value: dineroRecibidoTexto),
             const SizedBox(height: 8),
             _SummaryRow(
               label: 'Falta por cubrir',
@@ -457,9 +425,7 @@ class _PaymentSection extends StatelessWidget {
             const SizedBox(height: 8),
             _SummaryRow(
               label: 'Cambio a entregar',
-              value: formatearCentavosComoPesos(
-                paymentSummary.cambioCentavos,
-              ),
+              value: formatearCentavosComoPesos(paymentSummary.cambioCentavos),
               highlight: true,
             ),
           ],
@@ -470,9 +436,7 @@ class _PaymentSection extends StatelessWidget {
 }
 
 class _ValidationMessageCard extends StatelessWidget {
-  const _ValidationMessageCard({
-    required this.message,
-  });
+  const _ValidationMessageCard({required this.message});
 
   final PaymentValidationMessage message;
 
@@ -483,9 +447,7 @@ class _ValidationMessageCard extends StatelessWidget {
     return Card(
       color: colors.backgroundColor,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -494,9 +456,9 @@ class _ValidationMessageCard extends StatelessWidget {
             Text(
               colors.icon,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: colors.foregroundColor,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: colors.foregroundColor,
+                fontWeight: FontWeight.w900,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -506,17 +468,17 @@ class _ValidationMessageCard extends StatelessWidget {
                   Text(
                     message.titulo,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colors.foregroundColor,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      color: colors.foregroundColor,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     message.descripcion,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colors.foregroundColor,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: colors.foregroundColor,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -542,20 +504,20 @@ class _ValidationMessageColors {
   factory _ValidationMessageColors.fromType(PaymentValidationType type) {
     return switch (type) {
       PaymentValidationType.success => const _ValidationMessageColors(
-          backgroundColor: AppColors.fondoExito,
-          foregroundColor: AppColors.exito,
-          icon: '✓',
-        ),
+        backgroundColor: AppColors.fondoExito,
+        foregroundColor: AppColors.exito,
+        icon: '✓',
+      ),
       PaymentValidationType.warning => const _ValidationMessageColors(
-          backgroundColor: AppColors.fondoAdvertencia,
-          foregroundColor: AppColors.advertencia,
-          icon: '!',
-        ),
+        backgroundColor: AppColors.fondoAdvertencia,
+        foregroundColor: AppColors.advertencia,
+        icon: '!',
+      ),
       PaymentValidationType.error => const _ValidationMessageColors(
-          backgroundColor: AppColors.fondoError,
-          foregroundColor: AppColors.error,
-          icon: '×',
-        ),
+        backgroundColor: AppColors.fondoError,
+        foregroundColor: AppColors.error,
+        icon: '×',
+      ),
     };
   }
 }
@@ -580,18 +542,18 @@ class _SummaryRow extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.verdePrincipal,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: AppColors.verdePrincipal,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         const SizedBox(width: 16),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
+          ),
         ),
       ],
     );
@@ -619,13 +581,8 @@ class _ConfirmSaleButton extends StatelessWidget {
         disabledBackgroundColor: AppColors.botonDeshabilitado,
         disabledForegroundColor: AppColors.textoDeshabilitado,
         minimumSize: const Size.fromHeight(48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
       ),
       child: isSaving
           ? const Row(
@@ -634,9 +591,7 @@ class _ConfirmSaleButton extends StatelessWidget {
                 SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                  ),
+                  child: CircularProgressIndicator(strokeWidth: 2.4),
                 ),
                 SizedBox(width: 10),
                 Text('Guardando venta...'),
