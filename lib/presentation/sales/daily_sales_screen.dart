@@ -7,6 +7,7 @@ import '../../domain/models/daily_sales_summary.dart';
 import '../../domain/models/sale.dart';
 import '../../domain/models/sale_status.dart';
 import '../../domain/use_cases/calculate_daily_sales_summary.dart';
+import 'sale_detail_modal.dart';
 
 class DailySalesScreen extends StatefulWidget {
   const DailySalesScreen({
@@ -37,7 +38,11 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
   DateTime _today() {
     final now = DateTime.now();
 
-    return DateTime(now.year, now.month, now.day);
+    return DateTime(
+      now.year,
+      now.month,
+      now.day,
+    );
   }
 
   Future<List<Sale>> _loadSalesForDate(DateTime date) {
@@ -52,13 +57,21 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
 
   void _changeSelectedDate(DateTime date) {
     setState(() {
-      _selectedDate = DateTime(date.year, date.month, date.day);
+      _selectedDate = DateTime(
+        date.year,
+        date.month,
+        date.day,
+      );
       _salesFuture = _loadSalesForDate(_selectedDate);
     });
   }
 
   void _goToPreviousDay() {
-    _changeSelectedDate(_selectedDate.subtract(const Duration(days: 1)));
+    _changeSelectedDate(
+      _selectedDate.subtract(
+        const Duration(days: 1),
+      ),
+    );
   }
 
   void _goToToday() {
@@ -70,7 +83,11 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
       return;
     }
 
-    _changeSelectedDate(_selectedDate.add(const Duration(days: 1)));
+    _changeSelectedDate(
+      _selectedDate.add(
+        const Duration(days: 1),
+      ),
+    );
   }
 
   bool get _canGoToNextDay {
@@ -86,6 +103,29 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
     Navigator.of(context).maybePop();
   }
 
+  Future<void> _openSaleDetail(Sale sale) async {
+    final changed = await showSaleDetailModal(
+      context: context,
+      sale: sale,
+      saleRepository: widget.saleRepository,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (changed == true) {
+      _reloadSelectedDate();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Venta cancelada correctamente.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +136,7 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
           builder: (context, snapshot) {
             final isLoading =
                 snapshot.connectionState == ConnectionState.waiting ||
-                snapshot.connectionState == ConnectionState.active;
+                    snapshot.connectionState == ConnectionState.active;
 
             final ventas = snapshot.data ?? const <Sale>[];
 
@@ -129,11 +169,18 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
                       if (isLoading)
                         const _LoadingSalesCard()
                       else if (snapshot.hasError)
-                        _SalesErrorCard(onRetry: _reloadSelectedDate)
+                        _SalesErrorCard(
+                          onRetry: _reloadSelectedDate,
+                        )
                       else ...[
-                        _DailySummarySection(summary: resumen),
+                        _DailySummarySection(
+                          summary: resumen,
+                        ),
                         const SizedBox(height: 16),
-                        _SalesListSection(sales: ventas),
+                        _SalesListSection(
+                          sales: ventas,
+                          onSaleTap: _openSaleDetail,
+                        ),
                       ],
                     ],
                   ),
@@ -165,7 +212,10 @@ class _DailySalesHeader extends StatelessWidget {
           children: [
             FilledButton.icon(
               onPressed: onBackToMenu,
-              icon: const Icon(Icons.arrow_back_rounded, size: 20),
+              icon: const Icon(
+                Icons.arrow_back_rounded,
+                size: 20,
+              ),
               label: const Text('Menú principal'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.verdeOscuro,
@@ -177,7 +227,9 @@ class _DailySalesHeader extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
-                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const Spacer(),
@@ -193,17 +245,17 @@ class _DailySalesHeader extends StatelessWidget {
         Text(
           'Ventas del día',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: AppColors.verdeOscuro,
-            fontWeight: FontWeight.w800,
-          ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w800,
+              ),
         ),
         const SizedBox(height: 4),
         Text(
           'Consulta el resumen y las ventas registradas por fecha.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.verdePrincipal,
-            fontWeight: FontWeight.w500,
-          ),
+                color: AppColors.verdePrincipal,
+                fontWeight: FontWeight.w500,
+              ),
         ),
       ],
     );
@@ -227,12 +279,17 @@ class _DateNavigationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isToday = _isSameDate(selectedDate, DateTime.now());
+    final isToday = _isSameDate(
+      selectedDate,
+      DateTime.now(),
+    );
 
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -241,109 +298,111 @@ class _DateNavigationCard extends StatelessWidget {
               _formatLongDate(selectedDate),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w900,
-              ),
+                    color: AppColors.verdeOscuro,
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const SizedBox(height: 4),
             Text(
               isToday ? 'Hoy' : _formatWeekday(selectedDate),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: isToday ? AppColors.exito : AppColors.verdePrincipal,
-                fontWeight: FontWeight.w700,
-              ),
+                    color: isToday
+                        ? AppColors.exito
+                        : AppColors.verdePrincipal,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
             const SizedBox(height: 16),
             SizedBox(
-  height: 44,
-  child: Row(
-    children: [
-      Expanded(
-        child: FilledButton(
-          onPressed: onPreviousDay,
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.verdeOscuro,
-            foregroundColor: AppColors.amarilloMaiz,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          child: const FittedBox(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.chevron_left_rounded,
-                  size: 20,
-                ),
-                SizedBox(width: 2),
-                Text('Anterior'),
-              ],
-            ),
-          ),
-        ),
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: OutlinedButton(
-          onPressed: isToday ? null : onToday,
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.verdeOscuro,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            side: const BorderSide(
-              color: AppColors.verdePrincipal,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          child: const FittedBox(
-            child: Text('Hoy'),
-          ),
-        ),
-      ),
-      const SizedBox(width: 8),
-            Expanded(
-              child: FilledButton(
-                onPressed: canGoToNextDay ? onNextDay : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.verdeOscuro,
-                  foregroundColor: AppColors.amarilloMaiz,
-                  disabledBackgroundColor: AppColors.botonDeshabilitado,
-                  disabledForegroundColor: AppColors.textoDeshabilitado,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                child: const FittedBox(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Siguiente'),
-                      SizedBox(width: 2),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 20,
+              height: 44,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: onPreviousDay,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.verdeOscuro,
+                        foregroundColor: AppColors.amarilloMaiz,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ],
+                      child: const FittedBox(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.chevron_left_rounded,
+                              size: 20,
+                            ),
+                            SizedBox(width: 2),
+                            Text('Anterior'),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: isToday ? null : onToday,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.verdeOscuro,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        side: const BorderSide(
+                          color: AppColors.verdePrincipal,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      child: const FittedBox(
+                        child: Text('Hoy'),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: canGoToNextDay ? onNextDay : null,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.verdeOscuro,
+                        foregroundColor: AppColors.amarilloMaiz,
+                        disabledBackgroundColor: AppColors.botonDeshabilitado,
+                        disabledForegroundColor: AppColors.textoDeshabilitado,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        textStyle: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      child: const FittedBox(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Siguiente'),
+                            SizedBox(width: 2),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
           ],
         ),
       ),
@@ -359,7 +418,9 @@ class _LoadingSalesCard extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: const Padding(
         padding: EdgeInsets.all(28),
         child: Column(
@@ -375,7 +436,9 @@ class _LoadingSalesCard extends StatelessWidget {
 }
 
 class _SalesErrorCard extends StatelessWidget {
-  const _SalesErrorCard({required this.onRetry});
+  const _SalesErrorCard({
+    required this.onRetry,
+  });
 
   final VoidCallback onRetry;
 
@@ -384,7 +447,9 @@ class _SalesErrorCard extends StatelessWidget {
     return Card(
       color: AppColors.fondoError,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -393,9 +458,9 @@ class _SalesErrorCard extends StatelessWidget {
               'No se pudieron cargar las ventas.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.w800,
-              ),
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w800,
+                  ),
             ),
             const SizedBox(height: 12),
             FilledButton(
@@ -414,7 +479,9 @@ class _SalesErrorCard extends StatelessWidget {
 }
 
 class _DailySummarySection extends StatelessWidget {
-  const _DailySummarySection({required this.summary});
+  const _DailySummarySection({
+    required this.summary,
+  });
 
   final DailySalesSummary summary;
 
@@ -423,7 +490,9 @@ class _DailySummarySection extends StatelessWidget {
     return Card(
       color: AppColors.tarjetaMenu,
       elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: LayoutBuilder(
@@ -438,9 +507,9 @@ class _DailySummarySection extends StatelessWidget {
                 Text(
                   'Resumen del día',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w900,
-                  ),
+                        color: AppColors.verdeOscuro,
+                        fontWeight: FontWeight.w900,
+                      ),
                 ),
                 const SizedBox(height: 14),
                 Wrap(
@@ -464,28 +533,8 @@ class _DailySummarySection extends StatelessWidget {
                         title: 'Ventas completadas',
                         value: summary.ventasCompletadas.toString(),
                         description: summary.ventasCanceladas == 0
-                            ? 'Sin cancelaciones'
+                            ? '${summary.totalVentas} ventas registradas'
                             : '${summary.ventasCanceladas} canceladas',
-                      ),
-                    ),
-                    SizedBox(
-                      width: cardWidth,
-                      child: _DailySummaryCard(
-                        title: 'Dinero recibido',
-                        value: formatearCentavosComoPesos(
-                          summary.totalRecibidoCentavos,
-                        ),
-                        description: 'Entradas registradas',
-                      ),
-                    ),
-                    SizedBox(
-                      width: cardWidth,
-                      child: _DailySummaryCard(
-                        title: 'Cambio entregado',
-                        value: formatearCentavosComoPesos(
-                          summary.totalCambioCentavos,
-                        ),
-                        description: 'Cambio total del día',
                       ),
                     ),
                   ],
@@ -517,7 +566,9 @@ class _DailySummaryCard extends StatelessWidget {
     return Card(
       color: highlight ? AppColors.fondoExito : Colors.white,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
@@ -526,25 +577,27 @@ class _DailySummaryCard extends StatelessWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: highlight ? AppColors.exito : AppColors.verdePrincipal,
-                fontWeight: FontWeight.w700,
-              ),
+                    color: highlight
+                        ? AppColors.exito
+                        : AppColors.verdePrincipal,
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
               value,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: FontWeight.w900,
-              ),
+                    color: AppColors.verdeOscuro,
+                    fontWeight: FontWeight.w900,
+                  ),
             ),
             const SizedBox(height: 4),
             Text(
               description,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.verdePrincipal,
-                fontWeight: FontWeight.w500,
-              ),
+                    color: AppColors.verdePrincipal,
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ],
         ),
@@ -554,16 +607,22 @@ class _DailySummaryCard extends StatelessWidget {
 }
 
 class _SalesListSection extends StatelessWidget {
-  const _SalesListSection({required this.sales});
+  const _SalesListSection({
+    required this.sales,
+    required this.onSaleTap,
+  });
 
   final List<Sale> sales;
+  final ValueChanged<Sale> onSaleTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: sales.isEmpty
@@ -574,13 +633,24 @@ class _SalesListSection extends StatelessWidget {
                   Text(
                     'Ventas registradas',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.verdeOscuro,
-                      fontWeight: FontWeight.w900,
-                    ),
+                          color: AppColors.verdeOscuro,
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Toca una venta para ver su desglose.',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.verdePrincipal,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   const SizedBox(height: 12),
                   for (final sale in sales) ...[
-                    _SaleCard(sale: sale),
+                    _SaleCard(
+                      sale: sale,
+                      onTap: () => onSaleTap(sale),
+                    ),
                     const SizedBox(height: 10),
                   ],
                 ],
@@ -598,16 +668,18 @@ class _EmptySalesMessage extends StatelessWidget {
     return Card(
       color: AppColors.fondoAdvertencia,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Text(
           'No hay ventas registradas para este día.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.advertencia,
-            fontWeight: FontWeight.w800,
-          ),
+                color: AppColors.advertencia,
+                fontWeight: FontWeight.w800,
+              ),
         ),
       ),
     );
@@ -615,52 +687,71 @@ class _EmptySalesMessage extends StatelessWidget {
 }
 
 class _SaleCard extends StatelessWidget {
-  const _SaleCard({required this.sale});
+  const _SaleCard({
+    required this.sale,
+    required this.onTap,
+  });
 
   final Sale sale;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final isCancelled = sale.estado == SaleStatus.cancelada;
+
     return Card(
       color: AppColors.fondoAplicacion,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Venta de las ${_formatTime(sale.fechaHora)}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.verdeOscuro,
-                      fontWeight: FontWeight.w900,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Venta de las ${_formatTime(sale.fechaHora)}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.verdeOscuro,
+                            fontWeight: FontWeight.w900,
+                            decoration:
+                                isCancelled ? TextDecoration.lineThrough : null,
+                          ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  _SaleStatusChip(
+                    status: sale.estado,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _SaleAmountRow(
+                label: 'Total',
+                value: formatearCentavosComoPesos(sale.totalCentavos),
+                highlight: true,
+              ),
+              const SizedBox(height: 6),
+              _SaleAmountRow(
+                label: 'Recibido',
+                value: formatearCentavosComoPesos(
+                  sale.dineroRecibidoCentavos,
                 ),
-                _SaleStatusChip(status: sale.estado),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _SaleAmountRow(
-              label: 'Total',
-              value: formatearCentavosComoPesos(sale.totalCentavos),
-              highlight: true,
-            ),
-            const SizedBox(height: 6),
-            _SaleAmountRow(
-              label: 'Recibido',
-              value: formatearCentavosComoPesos(sale.dineroRecibidoCentavos),
-            ),
-            const SizedBox(height: 6),
-            _SaleAmountRow(
-              label: 'Cambio',
-              value: formatearCentavosComoPesos(sale.cambioCentavos),
-            ),
-          ],
+              ),
+              const SizedBox(height: 6),
+              _SaleAmountRow(
+                label: 'Cambio',
+                value: formatearCentavosComoPesos(sale.cambioCentavos),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -668,7 +759,9 @@ class _SaleCard extends StatelessWidget {
 }
 
 class _SaleStatusChip extends StatelessWidget {
-  const _SaleStatusChip({required this.status});
+  const _SaleStatusChip({
+    required this.status,
+  });
 
   final SaleStatus status;
 
@@ -677,7 +770,10 @@ class _SaleStatusChip extends StatelessWidget {
     final isCompleted = status == SaleStatus.completada;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 6,
+      ),
       decoration: BoxDecoration(
         color: isCompleted ? AppColors.fondoExito : AppColors.fondoError,
         borderRadius: BorderRadius.circular(50),
@@ -685,9 +781,9 @@ class _SaleStatusChip extends StatelessWidget {
       child: Text(
         status.nombreVisible,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: isCompleted ? AppColors.exito : AppColors.error,
-          fontWeight: FontWeight.w800,
-        ),
+              color: isCompleted ? AppColors.exito : AppColors.error,
+              fontWeight: FontWeight.w800,
+            ),
       ),
     );
   }
@@ -712,16 +808,16 @@ class _SaleAmountRow extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.verdePrincipal,
-            fontWeight: FontWeight.w500,
-          ),
+                color: AppColors.verdePrincipal,
+                fontWeight: FontWeight.w500,
+              ),
         ),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.verdeOscuro,
-            fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
-          ),
+                color: AppColors.verdeOscuro,
+                fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
+              ),
         ),
       ],
     );

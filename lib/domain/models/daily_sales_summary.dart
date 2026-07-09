@@ -4,8 +4,6 @@ class DailySalesSummary {
   final int ventasCompletadas;
   final int ventasCanceladas;
   final int totalVendidoCentavos;
-  final int totalRecibidoCentavos;
-  final int totalCambioCentavos;
 
   const DailySalesSummary({
     required this.fecha,
@@ -13,31 +11,32 @@ class DailySalesSummary {
     required this.ventasCompletadas,
     required this.ventasCanceladas,
     required this.totalVendidoCentavos,
-    required this.totalRecibidoCentavos,
-    required this.totalCambioCentavos,
-  }) : assert(totalVentas >= 0, 'El total de ventas no puede ser negativo.'),
-       assert(
-         ventasCompletadas >= 0,
-         'Las ventas completadas no pueden ser negativas.',
-       ),
-       assert(
-         ventasCanceladas >= 0,
-         'Las ventas canceladas no pueden ser negativas.',
-       ),
-       assert(
-         totalVendidoCentavos >= 0,
-         'El total vendido no puede ser negativo.',
-       ),
-       assert(
-         totalRecibidoCentavos >= 0,
-         'El total recibido no puede ser negativo.',
-       ),
-       assert(
-         totalCambioCentavos >= 0,
-         'El total de cambio no puede ser negativo.',
-       );
+  })  : assert(
+          totalVentas >= 0,
+          'El total de ventas no puede ser negativo.',
+        ),
+        assert(
+          ventasCompletadas >= 0,
+          'Las ventas completadas no pueden ser negativas.',
+        ),
+        assert(
+          ventasCanceladas >= 0,
+          'Las ventas canceladas no pueden ser negativas.',
+        ),
+        assert(
+          totalVendidoCentavos >= 0,
+          'El total vendido no puede ser negativo.',
+        );
 
   bool get estaVacio => totalVentas == 0;
+
+  int get ticketPromedioCentavos {
+    if (ventasCompletadas == 0) {
+      return 0;
+    }
+
+    return totalVendidoCentavos ~/ ventasCompletadas;
+  }
 
   @override
   String toString() {
@@ -46,9 +45,7 @@ class DailySalesSummary {
         'totalVentas: $totalVentas, '
         'ventasCompletadas: $ventasCompletadas, '
         'ventasCanceladas: $ventasCanceladas, '
-        'totalVendidoCentavos: $totalVendidoCentavos, '
-        'totalRecibidoCentavos: $totalRecibidoCentavos, '
-        'totalCambioCentavos: $totalCambioCentavos'
+        'totalVendidoCentavos: $totalVendidoCentavos'
         ')';
   }
 
@@ -61,9 +58,7 @@ class DailySalesSummary {
             totalVentas == other.totalVentas &&
             ventasCompletadas == other.ventasCompletadas &&
             ventasCanceladas == other.ventasCanceladas &&
-            totalVendidoCentavos == other.totalVendidoCentavos &&
-            totalRecibidoCentavos == other.totalRecibidoCentavos &&
-            totalCambioCentavos == other.totalCambioCentavos;
+            totalVendidoCentavos == other.totalVendidoCentavos;
   }
 
   @override
@@ -74,8 +69,6 @@ class DailySalesSummary {
       ventasCompletadas,
       ventasCanceladas,
       totalVendidoCentavos,
-      totalRecibidoCentavos,
-      totalCambioCentavos,
     );
   }
 }

@@ -10,16 +10,12 @@ abstract final class CalculateDailySalesSummary {
     var ventasCompletadas = 0;
     var ventasCanceladas = 0;
     var totalVendidoCentavos = 0;
-    var totalRecibidoCentavos = 0;
-    var totalCambioCentavos = 0;
 
     for (final venta in ventas) {
       switch (venta.estado) {
         case SaleStatus.completada:
           ventasCompletadas++;
           totalVendidoCentavos += venta.totalCentavos;
-          totalRecibidoCentavos += venta.dineroRecibidoCentavos;
-          totalCambioCentavos += venta.cambioCentavos;
 
         case SaleStatus.cancelada:
           ventasCanceladas++;
@@ -27,13 +23,15 @@ abstract final class CalculateDailySalesSummary {
     }
 
     return DailySalesSummary(
-      fecha: DateTime(fecha.year, fecha.month, fecha.day),
+      fecha: DateTime(
+        fecha.year,
+        fecha.month,
+        fecha.day,
+      ),
       totalVentas: ventas.length,
       ventasCompletadas: ventasCompletadas,
       ventasCanceladas: ventasCanceladas,
       totalVendidoCentavos: totalVendidoCentavos,
-      totalRecibidoCentavos: totalRecibidoCentavos,
-      totalCambioCentavos: totalCambioCentavos,
     );
   }
 }
