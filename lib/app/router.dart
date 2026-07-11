@@ -9,6 +9,7 @@ import '../presentation/purchase/product_selection_screen.dart';
 import '../presentation/purchase/purchase_summary_screen.dart';
 import '../presentation/purchase/sale_success_screen.dart';
 import '../presentation/sales/daily_sales_screen.dart';
+import '../presentation/sales/global_sales_statistics_screen.dart';
 
 abstract final class AppRoutes {
   static const String menuPrincipal = '/';
@@ -16,6 +17,7 @@ abstract final class AppRoutes {
   static const String resumenCompra = '/resumen-compra';
   static const String ventasDelDia = '/ventas-del-dia';
   static const String operacionExitosa = '/operacion-exitosa';
+  static const String estadisticasGlobales = '/estadisticas-globales';
 }
 
 class PurchaseSummaryRouteArguments {
@@ -142,6 +144,28 @@ abstract final class AppRouter {
           childBuilder: (context) => DailySalesScreen(
             saleRepository: saleRepository,
             onBackToMenu: () {
+              Navigator.of(context).maybePop();
+            },
+            onOpenStatistics: (selectedDate) {
+              Navigator.of(context).pushNamed(
+                AppRoutes.estadisticasGlobales,
+                arguments: selectedDate,
+              );
+            },
+          ),
+        );
+
+      case AppRoutes.estadisticasGlobales:
+        final initialDate = settings.arguments is DateTime
+            ? settings.arguments as DateTime
+            : DateTime.now();
+
+        return _buildSlideRoute(
+          settings: settings,
+          childBuilder: (context) => GlobalSalesStatisticsScreen(
+            saleRepository: saleRepository,
+            initialDate: initialDate,
+            onBack: () {
               Navigator.of(context).maybePop();
             },
           ),

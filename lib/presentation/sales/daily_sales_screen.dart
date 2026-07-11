@@ -16,10 +16,12 @@ class DailySalesScreen extends StatefulWidget {
     super.key,
     required this.saleRepository,
     this.onBackToMenu,
+    this.onOpenStatistics,
   });
 
   final SaleRepository saleRepository;
   final VoidCallback? onBackToMenu;
+  final ValueChanged<DateTime>? onOpenStatistics;
 
   @override
   State<DailySalesScreen> createState() => _DailySalesScreenState();
@@ -137,11 +139,14 @@ class _DailySalesScreenState extends State<DailySalesScreen> {
   }
 
   void _openGlobalStatistics() {
+    if (widget.onOpenStatistics != null) {
+      widget.onOpenStatistics!(_selectedDate);
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          'Las estadísticas globales se agregarán en el siguiente módulo.',
-        ),
+        content: Text('No se pudo abrir la pantalla de estadísticas.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
