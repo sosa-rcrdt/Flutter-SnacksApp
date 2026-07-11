@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/theme/app_colors.dart';
 import '../data/database/app_database.dart';
@@ -37,6 +38,13 @@ class _SnacksAppState extends State<SnacksApp> {
     return MaterialApp(
       title: 'Los de Acá',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('es', 'MX'),
+      supportedLocales: const [Locale('es', 'MX')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: ThemeData(
         useMaterial3: true,
         scaffoldBackgroundColor: AppColors.fondoAplicacion,

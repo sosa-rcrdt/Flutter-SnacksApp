@@ -11,22 +11,19 @@ class DailySalesSummary {
     required this.ventasCompletadas,
     required this.ventasCanceladas,
     required this.totalVendidoCentavos,
-  })  : assert(
-          totalVentas >= 0,
-          'El total de ventas no puede ser negativo.',
-        ),
-        assert(
-          ventasCompletadas >= 0,
-          'Las ventas completadas no pueden ser negativas.',
-        ),
-        assert(
-          ventasCanceladas >= 0,
-          'Las ventas canceladas no pueden ser negativas.',
-        ),
-        assert(
-          totalVendidoCentavos >= 0,
-          'El total vendido no puede ser negativo.',
-        );
+  }) : assert(totalVentas >= 0, 'El total de ventas no puede ser negativo.'),
+       assert(
+         ventasCompletadas >= 0,
+         'Las ventas completadas no pueden ser negativas.',
+       ),
+       assert(
+         ventasCanceladas >= 0,
+         'Las ventas canceladas no pueden ser negativas.',
+       ),
+       assert(
+         totalVendidoCentavos >= 0,
+         'El total vendido no puede ser negativo.',
+       );
 
   bool get estaVacio => totalVentas == 0;
 

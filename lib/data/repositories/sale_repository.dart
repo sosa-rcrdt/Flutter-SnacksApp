@@ -88,6 +88,18 @@ class SaleRepository {
     return detalles.map(_mapSaleDetailEntityToDomain).toList();
   }
 
+  Future<List<SaleDetail>> obtenerDetallesDeVentas(List<int> ventaIds) async {
+    if (ventaIds.isEmpty) {
+      return const <SaleDetail>[];
+    }
+
+    final detallesPorVenta = await Future.wait(
+      ventaIds.map(obtenerDetallesDeVenta),
+    );
+
+    return detallesPorVenta.expand((detalles) => detalles).toList();
+  }
+
   Future<List<Sale>> obtenerVentasEntre({
     required DateTime inicio,
     required DateTime fin,

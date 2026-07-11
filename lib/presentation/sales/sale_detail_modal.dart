@@ -17,19 +17,13 @@ Future<bool?> showSaleDetailModal({
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) {
-      return _SaleDetailModal(
-        sale: sale,
-        saleRepository: saleRepository,
-      );
+      return _SaleDetailModal(sale: sale, saleRepository: saleRepository);
     },
   );
 }
 
 class _SaleDetailModal extends StatefulWidget {
-  const _SaleDetailModal({
-    required this.sale,
-    required this.saleRepository,
-  });
+  const _SaleDetailModal({required this.sale, required this.saleRepository});
 
   final Sale sale;
   final SaleRepository saleRepository;
@@ -142,9 +136,7 @@ class _SaleDetailModalState extends State<_SaleDetailModal> {
         child: Container(
           decoration: const BoxDecoration(
             color: AppColors.fondoAplicacion,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(32),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
           ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -156,23 +148,16 @@ class _SaleDetailModalState extends State<_SaleDetailModal> {
                   children: [
                     const _ModalHandle(),
                     const SizedBox(height: 12),
-                    _SaleDetailHeader(
-                      sale: widget.sale,
-                      onClose: _close,
-                    ),
+                    _SaleDetailHeader(sale: widget.sale, onClose: _close),
                     const SizedBox(height: 16),
-                    _SalePaymentSummary(
-                      sale: widget.sale,
-                    ),
+                    _SalePaymentSummary(sale: widget.sale),
                     const SizedBox(height: 16),
                     _SaleProductsSection(
                       detailsFuture: _detailsFuture,
                       onRetry: () {
                         setState(() {
-                          _detailsFuture =
-                              widget.saleRepository.obtenerDetallesDeVenta(
-                            widget.sale.id,
-                          );
+                          _detailsFuture = widget.saleRepository
+                              .obtenerDetallesDeVenta(widget.sale.id);
                         });
                       },
                     ),
@@ -214,10 +199,7 @@ class _ModalHandle extends StatelessWidget {
 }
 
 class _SaleDetailHeader extends StatelessWidget {
-  const _SaleDetailHeader({
-    required this.sale,
-    required this.onClose,
-  });
+  const _SaleDetailHeader({required this.sale, required this.onClose});
 
   final Sale sale;
   final VoidCallback onClose;
@@ -231,24 +213,22 @@ class _SaleDetailHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _SaleStatusChip(
-                status: sale.estado,
-              ),
+              _SaleStatusChip(status: sale.estado),
               const SizedBox(height: 12),
               Text(
                 'Venta de las ${_formatTime(sale.fechaHora)}',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.verdeOscuro,
-                      fontWeight: FontWeight.w900,
-                    ),
+                  color: AppColors.verdeOscuro,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 _formatLongDate(sale.fechaHora),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.verdePrincipal,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: AppColors.verdePrincipal,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -265,9 +245,7 @@ class _SaleDetailHeader extends StatelessWidget {
 }
 
 class _SalePaymentSummary extends StatelessWidget {
-  const _SalePaymentSummary({
-    required this.sale,
-  });
+  const _SalePaymentSummary({required this.sale});
 
   final Sale sale;
 
@@ -276,9 +254,7 @@ class _SalePaymentSummary extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -291,9 +267,7 @@ class _SalePaymentSummary extends StatelessWidget {
             const SizedBox(height: 10),
             _AmountRow(
               label: 'Dinero recibido',
-              value: formatearCentavosComoPesos(
-                sale.dineroRecibidoCentavos,
-              ),
+              value: formatearCentavosComoPesos(sale.dineroRecibidoCentavos),
             ),
             const SizedBox(height: 10),
             _AmountRow(
@@ -321,7 +295,8 @@ class _SaleProductsSection extends StatelessWidget {
     return FutureBuilder<List<SaleDetail>>(
       future: detailsFuture,
       builder: (context, snapshot) {
-        final isLoading = snapshot.connectionState == ConnectionState.waiting ||
+        final isLoading =
+            snapshot.connectionState == ConnectionState.waiting ||
             snapshot.connectionState == ConnectionState.active;
 
         if (isLoading) {
@@ -359,9 +334,9 @@ class _SaleProductsSection extends StatelessWidget {
                     'No se pudo cargar el detalle de la venta.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.error,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      color: AppColors.error,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   FilledButton(
@@ -393,26 +368,24 @@ class _SaleProductsSection extends StatelessWidget {
                     'Esta venta no tiene productos registrados.',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.advertencia,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      color: AppColors.advertencia,
+                      fontWeight: FontWeight.w800,
+                    ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
                         'Productos vendidos',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: AppColors.verdeOscuro,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: AppColors.verdeOscuro,
+                              fontWeight: FontWeight.w900,
+                            ),
                       ),
                       const SizedBox(height: 12),
                       for (final detail in details) ...[
-                        _SaleDetailProductCard(
-                          detail: detail,
-                        ),
+                        _SaleDetailProductCard(detail: detail),
                         const SizedBox(height: 10),
                       ],
                     ],
@@ -425,9 +398,7 @@ class _SaleProductsSection extends StatelessWidget {
 }
 
 class _SaleDetailProductCard extends StatelessWidget {
-  const _SaleDetailProductCard({
-    required this.detail,
-  });
+  const _SaleDetailProductCard({required this.detail});
 
   final SaleDetail detail;
 
@@ -436,9 +407,7 @@ class _SaleDetailProductCard extends StatelessWidget {
     return Card(
       color: AppColors.fondoAplicacion,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -450,17 +419,17 @@ class _SaleDetailProductCard extends StatelessWidget {
                   Text(
                     detail.nombreProductoSnapshot,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.verdeOscuro,
-                          fontWeight: FontWeight.w900,
-                        ),
+                      color: AppColors.verdeOscuro,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${detail.cantidad} x ${formatearCentavosComoPesos(detail.precioUnitarioCentavosSnapshot)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.verdePrincipal,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: AppColors.verdePrincipal,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -469,9 +438,9 @@ class _SaleDetailProductCard extends StatelessWidget {
             Text(
               formatearCentavosComoPesos(detail.subtotalCentavos),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.verdeOscuro,
-                    fontWeight: FontWeight.w900,
-                  ),
+                color: AppColors.verdeOscuro,
+                fontWeight: FontWeight.w900,
+              ),
             ),
           ],
         ),
@@ -496,16 +465,9 @@ class _CancelSaleButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.error,
         minimumSize: const Size.fromHeight(48),
-        side: const BorderSide(
-          color: AppColors.error,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-        textStyle: const TextStyle(
-          fontWeight: FontWeight.w800,
-          fontSize: 16,
-        ),
+        side: const BorderSide(color: AppColors.error),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
       ),
       child: isCancelling
           ? const Row(
@@ -514,9 +476,7 @@ class _CancelSaleButton extends StatelessWidget {
                 SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                  ),
+                  child: CircularProgressIndicator(strokeWidth: 2.4),
                 ),
                 SizedBox(width: 10),
                 Text('Cancelando venta...'),
@@ -535,18 +495,16 @@ class _CancelledSaleMessage extends StatelessWidget {
     return Card(
       color: AppColors.fondoError,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Text(
           'Esta venta está cancelada. No suma al total vendido del día.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.error,
-                fontWeight: FontWeight.w800,
-              ),
+            color: AppColors.error,
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
@@ -554,9 +512,7 @@ class _CancelledSaleMessage extends StatelessWidget {
 }
 
 class _SaleStatusChip extends StatelessWidget {
-  const _SaleStatusChip({
-    required this.status,
-  });
+  const _SaleStatusChip({required this.status});
 
   final SaleStatus status;
 
@@ -567,10 +523,7 @@ class _SaleStatusChip extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 7,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: isCompleted ? AppColors.fondoExito : AppColors.fondoError,
           borderRadius: BorderRadius.circular(50),
@@ -578,9 +531,9 @@ class _SaleStatusChip extends StatelessWidget {
         child: Text(
           status.nombreVisible,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: isCompleted ? AppColors.exito : AppColors.error,
-                fontWeight: FontWeight.w900,
-              ),
+            color: isCompleted ? AppColors.exito : AppColors.error,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ),
     );
@@ -607,18 +560,18 @@ class _AmountRow extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.verdePrincipal,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: AppColors.verdePrincipal,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         const SizedBox(width: 16),
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.verdeOscuro,
-                fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
-              ),
+            color: AppColors.verdeOscuro,
+            fontWeight: highlight ? FontWeight.w900 : FontWeight.w700,
+          ),
         ),
       ],
     );

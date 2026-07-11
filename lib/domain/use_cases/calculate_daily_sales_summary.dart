@@ -23,11 +23,7 @@ abstract final class CalculateDailySalesSummary {
     }
 
     return DailySalesSummary(
-      fecha: DateTime(
-        fecha.year,
-        fecha.month,
-        fecha.day,
-      ),
+      fecha: DateTime(fecha.year, fecha.month, fecha.day),
       totalVentas: ventas.length,
       ventasCompletadas: ventasCompletadas,
       ventasCanceladas: ventasCanceladas,
